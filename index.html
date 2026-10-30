@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UTM Campaign Governance Hub & Builder</title>
+  <style>
+    :root { --primary: #0284c7; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 2rem; margin: 0; }
+    .container { max-width: 800px; margin: 0 auto; }
+    .card { background: var(--card); padding: 2rem; border-radius: 12px; border: 1px solid #334155; margin-bottom: 2rem; }
+    h1 { color: #38bdf8; margin-top: 0; }
+    label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #cbd5e1; }
+    input, select { width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 6px; border: 1px solid #475569; background: #0b1120; color: #fff; font-size: 14px; margin-bottom: 1.25rem; }
+    button { background: var(--primary); color: #fff; border: none; padding: 12px 24px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button:hover { background: #0369a1; }
+    .result { background: #030712; padding: 1rem; border-radius: 6px; border: 1px solid #1e293b; word-break: break-all; font-family: monospace; color: #38bdf8; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>UTM Campaign Governance Hub</h1>
+      <p style="color:#94a3b8">Enforces standardized UTM campaign taxonomies across Meta, Google Ads, TikTok, and Snapchat.</p>
+      
+      <label>Destination Landing Page URL</label>
+      <input type="url" id="base_url" value="https://store.sa/offers/ramadan">
+
+      <label>Campaign Source (utm_source)</label>
+      <select id="utm_source">
+        <option value="meta">meta (Facebook / Instagram)</option>
+        <option value="google">google (Google Ads / PMax / Search)</option>
+        <option value="tiktok">tiktok (TikTok Paid)</option>
+        <option value="snapchat">snapchat (Snapchat Ads)</option>
+        <option value="whatsapp">whatsapp (Direct Broadcasts)</option>
+      </select>
+
+      <label>Campaign Medium (utm_medium)</label>
+      <select id="utm_medium">
+        <option value="cpc">cpc (Paid Advertising)</option>
+        <option value="social">social (Organic Social)</option>
+        <option value="influencer">influencer (KOL / Creator Sponsorship)</option>
+        <option value="broadcast">broadcast (Direct Messaging)</option>
+      </select>
+
+      <label>Campaign Name (utm_campaign)</label>
+      <input type="text" id="utm_campaign" value="ksa_ramadan_eid_rush_2026">
+
+      <label>Campaign Content / Hook (utm_content)</label>
+      <input type="text" id="utm_content" value="vid9x16_urgency_hook">
+
+      <button onclick="buildUTM()">Generate Clean UTM URL</button>
+
+      <h3 style="margin-top:2rem;">Validated Clean URL:</h3>
+      <div id="output" class="result">https://store.sa/offers/ramadan?utm_source=meta&utm_medium=cpc&utm_campaign=ksa_ramadan_eid_rush_2026&utm_content=vid9x16_urgency_hook</div>
+    </div>
+  </div>
+
+  <script>
+    function cleanToken(str) {
+      return str.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_-]/g, '');
+    }
+    function buildUTM() {
+      const base = document.getElementById('base_url').value.trim();
+      const source = document.getElementById('utm_source').value;
+      const medium = document.getElementById('utm_medium').value;
+      const campaign = cleanToken(document.getElementById('utm_campaign').value);
+      const content = cleanToken(document.getElementById('utm_content').value);
+
+      const url = new URL(base);
+      url.searchParams.set('utm_source', source);
+      url.searchParams.set('utm_medium', medium);
+      url.searchParams.set('utm_campaign', campaign);
+      if (content) url.searchParams.set('utm_content', content);
+
+      document.getElementById('output').innerText = url.toString();
+    }
+  </script>
+</body>
+</html>

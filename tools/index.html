@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTM Campaign Governance Hub & Builder</title>
+<style>
+  :root { --primary: #2563eb; --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0; --text: #0f172a; --muted: #64748b; --danger: #ef4444; --success: #10b981; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 2rem 1rem; margin: 0; }
+  .container { max-width: 800px; margin: 0 auto; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+  h1 { font-size: 1.5rem; margin-top: 0; color: var(--text); display: flex; align-items: center; gap: 0.5rem; }
+  .badge { background: #dbeafe; color: var(--primary); font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-weight: 600; }
+  .form-group { margin-bottom: 1.25rem; }
+  label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text); }
+  .hint { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.35rem; }
+  input, select { width: 100%; box-sizing: border-box; padding: 0.65rem 0.75rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.875rem; font-family: inherit; }
+  input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+  .result-box { background: #f1f5f9; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-top: 1.5rem; }
+  .url-output { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-all; font-size: 0.875rem; color: #1e293b; background: #fff; padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border); margin: 0.5rem 0; min-height: 2.5rem; display: flex; align-items: center; }
+  .btn { background: var(--primary); color: #fff; border: none; padding: 0.65rem 1.25rem; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .btn:hover { background: #1d4ed8; }
+  .validation-status { font-size: 0.875rem; margin-top: 0.5rem; font-weight: 600; }
+  .valid { color: var(--success); }
+  .invalid { color: var(--danger); }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>UTM Governance Builder <span class="badge">Enterprise Ready</span></h1>
+  <p class="hint">Enforces canonical lowercase, hyphen delimiters, and standardized campaign naming schemas.</p>
+  
+  <div class="form-group">
+    <label>Landing Page URL *</label>
+    <input type="url" id="baseUrl" placeholder="https://yourbrand.com/landing" value="https://example.com/promo">
+  </div>
+  
+  <div class="form-group">
+    <label>UTM Source *</label>
+    <div class="hint">Ad platform or referring channel</div>
+    <select id="utmSource">
+      <option value="meta">meta (Facebook/Instagram)</option>
+      <option value="google">google (Search/Display/PMax)</option>
+      <option value="tiktok">tiktok</option>
+      <option value="snapchat">snapchat</option>
+      <option value="linkedin">linkedin</option>
+      <option value="newsletter">newsletter</option>
+      <option value="whatsapp">whatsapp</option>
+    </select>
+  </div>
+  
+  <div class="form-group">
+    <label>UTM Medium *</label>
+    <select id="utmMedium">
+      <option value="paid-social">paid-social</option>
+      <option value="cpc">cpc</option>
+      <option value="paid-search">paid-search</option>
+      <option value="display">display</option>
+      <option value="email">email</option>
+      <option value="affiliate">affiliate</option>
+      <option value="qr">qr</option>
+    </select>
+  </div>
+  
+  <div class="form-group">
+    <label>UTM Campaign *</label>
+    <div class="hint">Format: [geo]_[product]_[objective]_[date] (e.g., ksa_summer-sale_conv_2026-06)</div>
+    <input type="text" id="utmCampaign" placeholder="ksa_summer-sale_conv_2026" value="ksa_summer-sale_conv_2026">
+  </div>
+  
+  <div class="form-group">
+    <label>UTM Content / Creative ID (Optional)</label>
+    <input type="text" id="utmContent" placeholder="ugc-video-hook1_9x16_v01" value="ugc-video-hook1_9x16_v01">
+  </div>
+
+  <div class="result-box">
+    <label>Standardized Governance URL:</label>
+    <div class="url-output" id="outputUrl">https://example.com/promo</div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+      <button class="btn" onclick="copyUrl()">Copy Standardized Link</button>
+      <span class="validation-status valid" id="statusMsg">Valid Governance Syntax</span>
+    </div>
+  </div>
+</div>
+
+<script>
+function sanitizeToken(str) {
+  return str.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9_\-\.]/g, '');
+}
+
+function updateUrl() {
+  const base = document.getElementById('baseUrl').value.trim();
+  const source = sanitizeToken(document.getElementById('utmSource').value);
+  const medium = sanitizeToken(document.getElementById('utmMedium').value);
+  const campaign = sanitizeToken(document.getElementById('utmCampaign').value);
+  const content = sanitizeToken(document.getElementById('utmContent').value);
+  
+  if (!base) {
+    document.getElementById('outputUrl').innerText = "Please enter a valid URL";
+    document.getElementById('statusMsg').className = "validation-status invalid";
+    document.getElementById('statusMsg').innerText = "Missing Base URL";
+    return;
+  }
+  
+  try {
+    const url = new URL(base);
+    url.searchParams.set('utm_source', source);
+    url.searchParams.set('utm_medium', medium);
+    url.searchParams.set('utm_campaign', campaign);
+    if (content) url.searchParams.set('utm_content', content);
+    
+    document.getElementById('outputUrl').innerText = url.toString();
+    document.getElementById('statusMsg').className = "validation-status valid";
+    document.getElementById('statusMsg').innerText = "Compliant Enterprise UTM";
+  } catch (e) {
+    document.getElementById('outputUrl').innerText = "Invalid Base URL format";
+    document.getElementById('statusMsg').className = "validation-status invalid";
+    document.getElementById('statusMsg').innerText = "Malformed URL";
+  }
+}
+
+function copyUrl() {
+  const text = document.getElementById('outputUrl').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    alert("Copied to clipboard!");
+  });
+}
+
+document.querySelectorAll('input, select').forEach(el => {
+  el.addEventListener('input', updateUrl);
+});
+updateUrl();
+</script>
+</body>
+</html>

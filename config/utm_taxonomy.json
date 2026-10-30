@@ -1,0 +1,20 @@
+{
+  "sources": [
+    "meta",
+    "google",
+    "tiktok",
+    "snapchat",
+    "whatsapp",
+    "email",
+    "sms"
+  ],
+  "mediums": [
+    "cpc",
+    "social",
+    "influencer",
+    "broadcast",
+    "email",
+    "affiliate"
+  ],
+  "conventions": "Strict lowercase, alphanumeric and underscores only; zero spaces or special symbols."
+}
